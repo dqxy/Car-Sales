@@ -1,4 +1,4 @@
-import { TOGGLE_EDITING, UPDATE_TITLE, ADD_FEATURE } from '../actions/carActions';
+import { REMOVE_FEATURE, UPDATE_TOTAL, ADD_FEATURE } from '../actions/carActions';
 
 export const initialState = {
     additionalPrice: 0,
@@ -21,26 +21,34 @@ export const initialState = {
 export const carReducer = (state = initialState, action) => {
   console.log('&&&&&&&&&', state, action);
   switch (action.type) {
-    case UPDATE_TITLE:
+    case UPDATE_TOTAL:
       return {
         ...state,
-        title: action.payload,
-        editing: false
+        additionalPrice: state.car.features.reduce((a, b) => a + b.price, 0)
       };
-    // NEW CASE HERE
-    case TOGGLE_EDITING:
-      return {
-        ...state,
-        editing: !state.editing
-      };
-    case ADD_FEATURE:
+    case REMOVE_FEATURE:
       return {
         ...state,
         car: {
           ...state.car,
-          features: [...state.car.features, action.payload]
+          features: state.car.features.filter(
+            item => item.id !== action.payload
+          )
         }
-      }
+      };
+    case ADD_FEATURE:
+      return {
+            ...state,
+            additionalPrice: state.additionalPrice + action.payload.price,
+            car: {
+                ...state.car,
+                features: [...state.car.features, {
+                    id: Date.now(),
+                    name: action.payload.name,
+                    price: action.payload.price
+                }]
+            }
+        };
     default:
       return state;
   }
